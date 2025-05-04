@@ -1,0 +1,18 @@
+replicaCount: 1
+
+image:
+  repository: 741448960679.dkr.ecr.us-east-1.amazonaws.com/upload_service
+  tag:        latest
+  pullPolicy: Always
+
+service:
+  type: ClusterIP
+  port: 5000
+
+uploadsBucket: dev-uploads-d4834098
+serviceAccount:
+  create: true
+  name: upload-service-sa
+  annotations:
+    eks.amazonaws.com/role-arn: arn:aws:iam::741448960679:role/upload-service-irsa-role
+

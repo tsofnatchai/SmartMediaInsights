@@ -1,0 +1,7 @@
+apiVersion: v2
+name: results-service
+version: 0.1.0
+appVersion: "1.0"
+image:
+  repository: 741448960679.dkr.ecr.us-east-1.amazonaws.com/results_service
+  tag:        latest

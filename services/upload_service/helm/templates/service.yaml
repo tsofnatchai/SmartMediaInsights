@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  # Use the Helm release name as the Service name
+  name: {{ .Release.Name }}
+  labels:
+    # Tag with the release name for selector consistency
+    app: {{ .Release.Name }}
+spec:
+  type: {{ .Values.service.type }}
+  ports:
+    - port: {{ .Values.service.port }}
+      targetPort: {{ .Values.service.port }}
+  selector:
+    app: {{ .Release.Name }}
