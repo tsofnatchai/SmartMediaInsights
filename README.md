@@ -110,61 +110,57 @@ TLS-ready Ingress support
 
 📁 Project Structure
 SmartMediaInsights/
-│
-├── infra/                             # Terraform modules and root config
-│   ├── main.tf                        # Root module wiring together all infrastructure
-│   ├── provider.tf                    # AWS provider configuration
-│   ├── backend.tf                     # Remote state backend config (S3 + DynamoDB)
-│   ├── variables.tf                   # Shared variable declarations
-│   ├── outputs.tf                     # Root-level output values
-│   ├── terraform.tfvars               # Values for declared variables
+├── infra/                             # Terraform root module and configuration
+│   ├── main.tf                        # Orchestrates all modules
+│   ├── provider.tf                    # AWS provider and region setup
+│   ├── backend.tf                     # Backend state (S3 + DynamoDB lock)
+│   ├── variables.tf                   # Input variables
+│   ├── outputs.tf                     # Output values for use elsewhere
+│   ├── terraform.tfvars               # Variable values (e.g. passwords, names)
 │   └── modules/                       # Reusable Terraform modules
-│       ├── vpc/                       # Multi-AZ VPC, subnets, NAT, IGW
-│       ├── bastion/                   # EC2 instance for secure SSH into private subnets
-│       ├── eks/                       # EKS cluster and node groups
-│       ├── rds/                       # MySQL/PostgreSQL instance with security group
-│       ├── s3/                        # S3 bucket for uploads (trigger for Lambda)
-│       ├── kinesis/                   # Kinesis Data Stream for event ingestion
-│       ├── dynamodb/                  # DynamoDB table for metadata/lookup
-│       ├── lambda/                    # Lambda setup: IAM roles, triggers, env vars
-│       ├── kms/                       # Encryption key for S3/RDS/Kinesis
-│       ├── iam/                       # IAM roles/policies for EKS, Lambda, Terraform
-│       ├── waf/                       # WAF rules attached to ALB
-│       └── security/                  # Security groups for EKS, Lambda, RDS, etc.
+│       ├── vpc/                       # VPC, public/private subnets, IGW, NAT
+│       ├── bastion/                   # Bastion EC2 instance in public subnet
+│       ├── eks/                       # EKS cluster and managed node groups
+│       ├── rds/                       # RDS MySQL instance + subnet group + SG
+│       ├── s3/                        # Encrypted upload bucket with event triggers
+│       ├── kinesis/                   # Kinesis stream for async events
+│       ├── dynamodb/                  # Lookup table for sentiment tags (optional)
+│       ├── iam/                       # Roles and policies for EKS, Lambda, S3
+│       ├── lambda/                    # Lambda deployments (Rekognition + Comprehend)
+│       └── security/                  # Security groups for RDS, Lambda, bastion, EKS
 │
-├── services/                          # Flask microservices + Docker + Helm
-│   ├── upload_service/                # Service to upload files to S3
-│   │   ├── app.py                     # Flask app
-│   │   ├── Dockerfile                 # Docker container definition
-│   │   └── helm/                      # Helm chart for EKS deployment
+├── lambda/                            # Source for serverless functions
+│   ├── analyze_image/                 # Triggered by S3 object creation
+│   │   └── handler.py                 # Uses Rekognition and sends to Kinesis
+│   ├── process_stream/               # Triggered by Kinesis stream
+│   │   └── handler.py                 # Uses Comprehend and writes to RDS
+│   ├── build.ps1                      # PowerShell script to zip and deploy both Lambdas
+│   └── package/                       # Temporary build directory for dependencies
+│
+├── services/                          # Microservices deployed to EKS
+│   ├── upload_service/                # Accepts files and uploads to S3
+│   │   ├── app.py                     # Flask application logic
+│   │   ├── Dockerfile                 # Builds Docker image
+│   │   └── helm/                      # Helm chart for Kubernetes deployment
 │   │       ├── Chart.yaml
 │   │       ├── values.yaml
 │   │       └── templates/
 │   │           ├── deployment.yaml
 │   │           ├── service.yaml
-│   │           └── ingress.yaml
-│   │
-│   └── results_service/               # Service to fetch file analysis from RDS
-│       ├── app.py
-│       ├── Dockerfile
-│       └── helm/
-│           ├── Chart.yaml
-│           ├── values.yaml
-│           └── templates/
-│               ├── deployment.yaml
-│               ├── service.yaml
-│               └── ingress.yaml
+│   │           └── secret.yaml
+│   ├── results_service/              # Reads RDS and returns analysis
+│   │   ├── app.py                     # Flask app with /results/<id>
+│   │   ├── Dockerfile
+│   │   └── helm/
+│   │       ├── Chart.yaml
+│   │       ├── values.yaml
+│   │       └── templates/
+│   │           ├── deployment.yaml
+│   │           ├── service.yaml
+│   │           └── secret.yaml
 │
-├── lambda/                            # AWS Lambda functions
-│   ├── analyze_image/                 # Triggered by S3 -> calls Rekognition
-│   │   ├── handler.py                 # Main Lambda logic
-│   │   └── analyze_image.zip          # Deployment package
-│   │
-│   └── process_stream/                # Triggered by Kinesis -> calls Comprehend
-│       ├── handler.py
-│       ├── process_stream.zip
-│       └── package/                   # Dependencies (e.g., pymysql)
-│           ├── pymysql/
-│           └── ...
+├── scripts/                           # Optional: helper scripts (e.g. zip/test/deploy)
+│   └── port-forward.sh                # Port forward commands for local curl
 │
-└── README.md                          # Project overview and deployment instructions
+└── README.md                          # Overview, architecture, deployment steps
+
