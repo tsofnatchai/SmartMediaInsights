@@ -55,58 +55,47 @@ AWS Resources required beforehand:
 
 ---
 
-## Setup Instructions
+## Deployment steps
 
-### 1. Clone & Initialize
-
-```bash
-git clone https://github.com/yourusername/SmartMediaInsights.git
-cd SmartMediaInsights
-
-2. Initialize Terraform
+1. Provision Infrastructure
 cd infra
 terraform init
 terraform apply
-3. Build and Push Microservice Containers
-# Example: Upload Service
-cd services/upload_service
-docker build -t upload_service:latest .
-docker tag upload_service:latest <your-ecr-url>/upload_service:latest
-docker push <your-ecr-url>/upload_service:latest
-Repeat for results_service.
+This sets up:
 
-4. Deploy to EKS with Helm
-helm upgrade --install upload-service services/upload_service/helm --namespace production --create-namespace
-helm upgrade --install results-service services/results_service/helm --namespace production
-5. Update Lambda Code (if changed)
-aws lambda update-function-code \
-  --function-name dev-process-stream \
-  --zip-file fileb://infra/modules/lambda/process_stream.zip
-How It Works
-/upload → Upload Service saves file to S3
+VPC, subnets, NAT gateway
 
-S3 event → Triggers analyze_image Lambda → Rekognition → metadata → Kinesis
+EKS cluster and node group
 
-Kinesis → Triggers process_stream Lambda → Comprehend → RDS
+RDS MySQL instance
 
-/results/{file} → Results Service reads from RDS and returns insights
+S3 bucket for uploads
 
-Testing
-kubectl port-forward svc/upload-service 9090:5000 -n production
-curl -X POST http://localhost:9090/upload -F file=@/path/to/image.jpg
+IAM roles and policies for Lambda
 
-kubectl port-forward svc/results-service 9091:5000 -n production
-curl http://localhost:9091/results/image.jpg
-Security & Best Practices
-IAM roles with least-privilege
+2. Build & Push Docker Image
+cd services/media_service
+docker build -t media_service .
+docker tag media_service:latest 741448960679.dkr.ecr.us-east-1.amazonaws.com/media_service:latest
+docker push 741448960679.dkr.ecr.us-east-1.amazonaws.com/media_service:latest
+3. Deploy Flask App via Helm
+helm upgrade --install media-service ./helm --namespace default
+4. Package and Deploy Lambda Functions
+cd lambda
+./build.ps1  # Creates analyze_image.zip and process_stream.zip
 
-VPC subnet isolation
+# Apply changes using Terraform
+cd ../infra
+terraform apply
+5. Test the Platform
 
-All storage encrypted (S3, RDS, Kinesis)
+# Upload image
+curl -X POST -F "file=@cat.jpg" http://<ingress-ELB>/upload
 
-ALB protected by WAF
+# Get analysis result
+curl "http://<ingress-ELB>/result?id=cat.jpg"
 
-TLS-ready Ingress support
+
 
 📁 Project Structure
 SmartMediaInsights/
@@ -137,27 +126,23 @@ SmartMediaInsights/
 │   ├── build.ps1                      # PowerShell script to zip and deploy both Lambdas
 │   └── package/                       # Temporary build directory for dependencies
 │
-├── services/                          # Microservices deployed to EKS
-│   ├── upload_service/                # Accepts files and uploads to S3
-│   │   ├── app.py                     # Flask application logic
-│   │   ├── Dockerfile                 # Builds Docker image
-│   │   └── helm/                      # Helm chart for Kubernetes deployment
-│   │       ├── Chart.yaml
-│   │       ├── values.yaml
-│   │       └── templates/
-│   │           ├── deployment.yaml
-│   │           ├── service.yaml
-│   │           └── secret.yaml
-│   ├── results_service/              # Reads RDS and returns analysis
-│   │   ├── app.py                     # Flask app with /results/<id>
-│   │   ├── Dockerfile
-│   │   └── helm/
-│   │       ├── Chart.yaml
-│   │       ├── values.yaml
-│   │       └── templates/
-│   │           ├── deployment.yaml
-│   │           ├── service.yaml
-│   │           └── secret.yaml
+├── services/
+│   └── media_service/              # Flask service (upload + result)
+│       ├── app.py
+│       ├── Dockerfile
+│       ├── requirements.txt
+│       └── helm/                   # Helm chart
+│           ├── values.yaml
+│           ├── Chart.yaml
+│           └── templates/
+│               ├── deployment.yaml
+│               ├── service.yaml
+│               ├── ingress.yaml
+│               ├── secret.yaml
+│               ├── configmap.yaml
+│               ├── hpa.yaml
+│               ├── _helpers.tpl
+|                
 │
 ├── scripts/                           # Optional: helper scripts (e.g. zip/test/deploy)
 │   └── port-forward.sh                # Port forward commands for local curl
