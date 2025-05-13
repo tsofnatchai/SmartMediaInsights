@@ -26,7 +26,7 @@ This project automates a platform that allows users to upload media files, trigg
 
 ### 1. Infrastructure-as-Code (Terraform in `/infra`)
 - Modules for:
-  - VPC, EKS, RDS, IAM, Kinesis, S3, Lambda, WAF, KMS
+    - VPC, EKS, RDS, IAM, Kinesis, S3, Lambda, WAF, KMS
 - Uses remote backend via S3 and DynamoDB for state management
 
 ### 2. service (`/services`)

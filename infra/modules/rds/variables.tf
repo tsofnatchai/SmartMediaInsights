@@ -6,6 +6,11 @@ variable "vpc_id" {
 variable "private_subnets" {
   description = "List of private subnet IDs for RDS"
   type        = list(string)
+  default = []
+}
+variable "public_subnets" {
+  description = "List of public subnet IDs for RDS"
+  type        = list(string)
 }
 
 variable "ec2_security_group_id" {

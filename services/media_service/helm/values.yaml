@@ -1,0 +1,23 @@
+replicaCount: 2
+
+image:
+  repository: 741448960679.dkr.ecr.us-east-1.amazonaws.com/media_service
+  tag: latest
+  pullPolicy: Always
+
+service:
+  type: ClusterIP
+  port: 80
+
+env:
+  uploadBucket: dev-uploads-d8931c03
+
+ingress:
+  enabled: true
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+  hosts:
+    - host: media.smart.local
+      paths:
+        - path: /
+          pathType: Prefix

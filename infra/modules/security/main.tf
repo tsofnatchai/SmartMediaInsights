@@ -57,7 +57,7 @@ resource "aws_security_group" "rds_sg" {
     from_port       = 3306
     to_port         = 3306
     protocol        = "tcp"
-    security_groups = [aws_security_group.ec2_sg.id, aws_security_group.lambda_sg.id]
+    security_groups = [aws_security_group.ec2_sg.id, aws_security_group.lambda_sg.id, var.bastion_sg_id]
   }
   egress {
     from_port   = 0
@@ -78,12 +78,3 @@ resource "aws_security_group" "lambda_sg" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 }
-# resource "aws_security_group_rule" "allow_lambda_to_rds" {
-#   type                     = "ingress"
-#   from_port               = 3306
-#   to_port                 = 3306
-#   protocol                = "tcp"
-#   security_group_id       = aws_security_group.rds_sg.id           # The RDS SG
-#   source_security_group_id = aws_security_group.lambda_sg.id       # The Lambda SG
-#   description             = "Allow Lambda SG to access RDS on 3306"
-# }

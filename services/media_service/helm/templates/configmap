@@ -1,0 +1,8 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: media-service-config
+data:
+  DB_HOST: mysql-db.curs4g4yygzv.us-east-1.rds.amazonaws.com
+  DB_NAME: mydatabase
+  UPLOAD_BUCKET: dev-uploads-d8931c03

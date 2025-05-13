@@ -1,6 +1,0 @@
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: results-config
-data:
-  db_host: mysql-db.curs4g4yygzv.us-east-1.rds.amazonaws.com

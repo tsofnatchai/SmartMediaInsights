@@ -62,7 +62,17 @@ resource "aws_iam_role_policy_attachment" "lambda_vpc_access" {
   role       = aws_iam_role.lambda_exec.name
   policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole"
 }
+# Attach ComprehendFullAccess
+resource "aws_iam_role_policy_attachment" "comprehend" {
+  role       = aws_iam_role.lambda_exec.name
+  policy_arn = "arn:aws:iam::aws:policy/ComprehendFullAccess"
+}
 
+# Attach RekognitionFullAccess
+resource "aws_iam_role_policy_attachment" "rekognition" {
+  role       = aws_iam_role.lambda_exec.name
+  policy_arn = "arn:aws:iam::aws:policy/AmazonRekognitionFullAccess"
+}
 resource "aws_iam_role_policy" "lambda_vpc_network" {
   name = "lambda-vpc-network"
   role = aws_iam_role.lambda_exec.id

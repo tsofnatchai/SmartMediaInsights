@@ -1,17 +1,30 @@
-#store result in RDS
-import boto3, json, pymysql, os
-import base64
+# Store result in RDS
+import boto3, json, pymysql, os, base64
+from pymysql.err import OperationalError
 
 comprehend = boto3.client('comprehend')
 
-rds_conn = pymysql.connect(
-    host=os.environ['DB_HOST'],
-    user=os.environ['DB_USER'],
-    password=os.environ['DB_PASSWORD'],
-    db=os.environ['DB_NAME']
-)
+
+
+
+def connect_to_rds():
+    try:
+        conn = pymysql.connect(
+            host=os.environ['DB_HOST'],
+            user=os.environ['DB_USER'],
+            password=os.environ['DB_PASSWORD'],
+            db=os.environ['DB_NAME'],
+            connect_timeout=5
+        )
+        print("RDS connection established.")
+        return conn
+    except OperationalError as e:
+        print(f"Failed to connect to RDS: {e}")
+        raise e
 
 def lambda_handler(event, context):
+    rds_conn = connect_to_rds()
+
     for record in event['Records']:
         data_b64 = record['kinesis']['data']
         payload = json.loads(base64.b64decode(data_b64).decode("utf-8"))
@@ -31,4 +44,6 @@ def lambda_handler(event, context):
 
         rds_conn.commit()
 
+    rds_conn.close()
     return {'status': 'processed'}
+

@@ -1,42 +1,4 @@
-# variable "region" {
-#   type    = string
-#   default = "us-east-1"
-# }
-#
-# variable "environment" {
-#   type    = string
-#   default = "dev"
-# }
-# variable "vpc_cidr" {
-#   description = "CIDR block for the VPC"
-#   type        = string
-#   default     = "10.0.0.0/16"
-# }
-# # Bastion host configuration
-# variable "bastion_key_pair" {
-#   description = "SSH key pair name for the bastion host"
-#   type        = string
-# }
-#
-# variable "bastion_public_key_path" {
-#   description = "Filesystem path to the SSH public key for the bastion key pair"
-#   type        = string
-# }
-#
-# variable "ssh_allowed_cidr" {
-#   description = "CIDR range allowed to SSH into the bastion host"
-#   type        = string
-# }
-#
-# variable "bastion_ami" {
-#   description = "AMI ID to use for the bastion host"
-#   type        = string
-# }
-#
-# variable "bastion_instance_type" {
-#   description = "EC2 instance type for the bastion host"
-#   type        = string
-# }
+
 variable "db_name" {
   description = "RDS database name"
   type        = string
@@ -55,8 +17,6 @@ variable "db_password" {
   sensitive   = true
   default     = "ChangeMe123!"
 }
-
-################################
 
 # IAM module parameters
 variable "ec2_policy_name" {
@@ -103,7 +63,6 @@ variable "bastion_ami" {
   description = "AMI ID to use for the bastion host"
   type        = string
   default     = "ami-049682606efa7fe65"  # Example: Amazon Linux 2 in us-east-1
-  #default = ami-004028b2e02dad333 #bastion ami
 }
 
 variable "bastion_instance_type" {
@@ -114,23 +73,7 @@ default     = "t3.micro"
 variable "s3_bucket_name" {
   description = "Name of the S3 bucket used by the application (e.g. uploads, logs, etc.)"
   type        = string
-  default = "dev-uploads-d4834098"
-  #default     = "smartmedia-insights-uploads-dev"
 }
-
-
-
-# variable "s3_bucket_arn" {
-#   description = "ARN of the S3 bucket that EC2 instances will access."
-#   type        = string
-#   # Replace with your actual S3 bucket ARN, e.g.: "arn:aws:s3:::my-bucket"
-#   default     = "arn:aws:s3:::terraform-state-bucket-tsofnat"
-# }
-# variable "s3_bucket_name" {
-#   description = "Name of the S3 bucket for remote state"
-#   type        = string
-#   default     = "terraform-state-bucket-tsofnat"
-# }
 variable "vpc_cidr" {
   description = "CIDR block for the VPC"
   type        = string
@@ -150,4 +93,9 @@ variable "alb_sg_cidr" {
   description = "CIDR block allowed to access the ALB"
   type        = string
   default     = "0.0.0.0/0"
+}
+variable "publicly_accessible" {
+  description = "RDS publicly_accessible"
+  type        = bool
+  default     = true
 }

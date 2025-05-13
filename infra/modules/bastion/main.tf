@@ -36,3 +36,4 @@ resource "aws_instance" "bastion" {
     Name = "${var.environment}-bastion"
   }
 }
+

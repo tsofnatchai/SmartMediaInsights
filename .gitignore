@@ -1,32 +1,44 @@
+# Terraform
+*.tfstate
+*.tfstate.*
+.terraform/
+terraform.tfvars
+
+# Lambda zip builds
+lambda/*.zip
+lambda/*/package/
+*.zip
+
 # Python
 __pycache__/
 *.pyc
-.venv/
-env/
+*.pyo
+*.pyd
 *.egg-info/
 
-# Terraform
-.terraform/
-*.tfstate
-*.tfstate.*
-crash.log
-terraform.tfvars
-override.tf
-override.tf.json
-*.backup
+# Docker
+*.log
+*.pid
 
-# AWS
-*.pem
-*.zip
-*.bak
+# OS
+.DS_Store
+Thumbs.db
 
-# VS Code / PyCharm
+# VS Code / IDEs
 .vscode/
 .idea/
 
-# Logs
-*.log
+# Helm chart packaging
+*.tgz
 
-# OS-specific
-.DS_Store
-Thumbs.db
+# Secrets
+.env
+*.pem
+*.key
+*.crt
+
+# AWS credentials if exported
+.aws/
+
+# Jupyter or other notebooks
+*.ipynb

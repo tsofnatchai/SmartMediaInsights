@@ -30,8 +30,12 @@ variable "service_account_name" {
   type        = string
   default     = "upload-service-sa"
 }
+variable "region" {
+  description = "AWS region"
+  type        = string
+}
 
-# variable "s3_bucket_name" {
-#   description = "S3 bucket name for uploads"
-#   type        = string
-# }
+variable "kinesis_stream_name" {
+  description = "Kinesis stream name"
+  type        = string
+}

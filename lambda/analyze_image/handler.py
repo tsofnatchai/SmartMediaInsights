@@ -6,27 +6,33 @@ kinesis = boto3.client('kinesis')
 stream_name = os.environ.get("KINESIS_STREAM_NAME", "dev-events")
 
 def lambda_handler(event, context):
-    # Get S3 object info from event
-    record = event['Records'][0]
-    bucket = record['s3']['bucket']['name']
-    key = record['s3']['object']['key']
+    try:
+        print("=== RAW EVENT ===")
+        print(json.dumps(event, indent=2))  # Always log raw event
 
-    # Analyze image with Rekognition
-    response = rek.detect_labels(
-        Image={'S3Object': {'Bucket': bucket, 'Name': key}},
-        MaxLabels=5
-    )
+        record = event['Records'][0]
+        bucket = record['s3']['bucket']['name']
+        key = record['s3']['object']['key']
 
-    labels = [label['Name'] for label in response['Labels']]
+        response = rek.detect_labels(
+            Image={'S3Object': {'Bucket': bucket, 'Name': key}},
+            MaxLabels=5
+        )
+        labels = [label['Name'] for label in response['Labels']]
 
-    # Send to Kinesis
-    kinesis.put_record(
-        StreamName=stream_name,
-        Data=json.dumps({
-            'id': key,
-            'labels': labels
-        }),
-        PartitionKey=key
-    )
+        kinesis.put_record(
+            StreamName=stream_name,
+            Data=json.dumps({'id': key, 'labels': labels}),
+            PartitionKey=key
+        )
 
-    return { 'status': 'ok', 'labels': labels }
+        print(f"Processed {key}, labels: {labels}")
+        return { 'status': 'ok', 'labels': labels }
+
+    except Exception as e:
+        import traceback
+        print("=== ERROR OCCURRED ===")
+        traceback.print_exc()  # Print full traceback
+        raise
+
+
