@@ -29,9 +29,8 @@ This project automates a platform that allows users to upload media files, trigg
   - VPC, EKS, RDS, IAM, Kinesis, S3, Lambda, WAF, KMS
 - Uses remote backend via S3 and DynamoDB for state management
 
-### 2. Microservices (`/services`)
-- `upload_service`: Accepts files and stores them in S3
-- `results_service`: Reads analysis results from RDS and serves via API
+### 2. service (`/services`)
+- `media_service`: Accepts files and stores them in S3, Reads analysis results from RDS and serves via API
 
 ### 3. Serverless Functions (`/lambda`)
 - `analyze_image`: S3-triggered Lambda that calls Rekognition
