@@ -56,32 +56,32 @@ AWS Resources required beforehand:
 
 ## Deployment steps
 
-1. Provision Infrastructure
-cd infra
-terraform init
-terraform apply
-This sets up:
+# 1. Provision Infrastructure
+      cd infra
+      terraform init
+      terraform apply
+      This sets up:
+      
+      VPC, subnets, NAT gateway
+      
+      EKS cluster and node group
+      
+      RDS MySQL instance
+      
+      S3 bucket for uploads
+      
+      IAM roles and policies for Lambda
 
-VPC, subnets, NAT gateway
-
-EKS cluster and node group
-
-RDS MySQL instance
-
-S3 bucket for uploads
-
-IAM roles and policies for Lambda
-
-2. Build & Push Docker Image
-cd services/media_service
-docker build -t media_service .
-docker tag media_service:latest 741448960679.dkr.ecr.us-east-1.amazonaws.com/media_service:latest
-docker push 741448960679.dkr.ecr.us-east-1.amazonaws.com/media_service:latest
-3. Deploy Flask App via Helm
-helm upgrade --install media-service ./helm --namespace default
-4. Package and Deploy Lambda Functions
-cd lambda
-./build.ps1  # Creates analyze_image.zip and process_stream.zip
+# 2. Build & Push Docker Image
+      cd services/media_service
+      docker build -t media_service .
+      docker tag media_service:latest 741448960679.dkr.ecr.us-east-1.amazonaws.com/media_service:latest
+      docker push 741448960679.dkr.ecr.us-east-1.amazonaws.com/media_service:latest
+# 3. Deploy Flask App via Helm
+      helm upgrade --install media-service ./helm --namespace default
+# 4. Package and Deploy Lambda Functions
+      cd lambda
+      ./build.ps1  # Creates analyze_image.zip and process_stream.zip
 
 # Apply changes using Terraform
 cd ../infra
@@ -95,8 +95,9 @@ curl -X POST -F "file=@cat.jpg" http://<ingress-ELB>/upload
 curl "http://<ingress-ELB>/result?id=cat.jpg"
 
 
-
+# Project Structure
 📁 Project Structure
+<pre> ```
 SmartMediaInsights/
 ├── infra/                             # Terraform root module and configuration
 │   ├── main.tf                        # Orchestrates all modules
@@ -146,5 +147,5 @@ SmartMediaInsights/
 ├── scripts/                           # Optional: helper scripts (e.g. zip/test/deploy)
 │   └── port-forward.sh                # Port forward commands for local curl
 │
-└── README.md                          # Overview, architecture, deployment steps
+└── README.md                          # Overview, architecture, deployment steps``` </pre>
 
