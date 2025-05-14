@@ -157,3 +157,5 @@ SmartMediaInsights/
 │
 └── README.md                          # Overview, architecture, deployment steps``` </pre>
 
+
+![image](https://github.com/user-attachments/assets/941f79c1-af83-4fa8-9fea-4cc00904e2ee)
