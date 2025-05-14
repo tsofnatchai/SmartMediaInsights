@@ -46,7 +46,6 @@ module "security" {
   vpc_id      = module.vpc.vpc_id
   alb_sg_cidr = var.alb_sg_cidr
   environment = var.environment
-  bastion_sg_id = module.bastion.bastion_security_group_id
 }
 #################################################################
 # Databases
