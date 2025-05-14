@@ -82,18 +82,26 @@ AWS Resources required beforehand:
 # 4. Package and Deploy Lambda Functions
       cd lambda
       ./build.ps1  # Creates analyze_image.zip and process_stream.zip
+      aws lambda update-function-code \
+      --function-name dev-analyze-image \
+      --zip-file fileb://../infra/modules/lambda/analyze_image.zip
+
+      aws lambda update-function-code \
+      --function-name dev-process-stream \
+      --zip-file fileb://../infra/modules/lambda/process_stream.zip
 
 # Apply changes using Terraform
-cd ../infra
-terraform apply
-5. Test the Platform
+    cd ../infra
+    terraform apply
+# 5. Test the Platform
 
-# Upload image
-curl -X POST -F "file=@cat.jpg" http://<ingress-ELB>/upload
+    # Upload image
+    curl -X POST -F "file=@/c/Users/TsofnatChai/Documents/cat.jpg" http://a34cfef55b2f847428f8834d530fff2b-25467038.us-east-1.elb.amazonaws.com/upload
+    
+    # Get analysis result
+    curl "http://a34cfef55b2f847428f8834d530fff2b-25467038.us-east-1.elb.amazonaws.com/result?id=cat.jpg"
 
-# Get analysis result
-curl "http://<ingress-ELB>/result?id=cat.jpg"
-
+![image](https://github.com/user-attachments/assets/c34606d4-ad72-43f4-88e1-227e59853f20)
 
 # Project Structure
 📁 Project Structure
