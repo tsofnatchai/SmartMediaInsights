@@ -8,7 +8,4 @@ variable "alb_sg_cidr" {
   type        = string
 }
 variable "environment" { type = string }
-variable "bastion_sg_id" {
-  description = "Security Group ID for the bastion host"
-  type        = string
-}
+
