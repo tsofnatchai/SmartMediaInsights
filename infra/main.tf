@@ -9,21 +9,6 @@ module "vpc" {
 }
 
 #################################################################
-# Bastion Jump-Host
-#################################################################
-module "bastion" {
-  source                  = "./modules/bastion"
-  environment             = var.environment
-  vpc_id                  = module.vpc.vpc_id
-  public_subnets          = module.vpc.public_subnets
-  bastion_key_pair        = var.bastion_key_pair
-  bastion_public_key_path = var.bastion_public_key_path
-  ssh_allowed_cidr        = var.ssh_allowed_cidr
-  bastion_ami             = var.bastion_ami
-  bastion_instance_type   = var.bastion_instance_type
-}
-
-#################################################################
 # IAM & Roles
 #################################################################
 module "iam_upload_service" {
@@ -116,11 +101,4 @@ module "lambda" {
   lambda_security_group_id = module.security.lambda_security_group_id
 }
 
-#################################################################
-# WAF Web ACL
-#################################################################
-module "waf" {
-  source      = "./modules/waf"
-  environment = var.environment
-}
 
